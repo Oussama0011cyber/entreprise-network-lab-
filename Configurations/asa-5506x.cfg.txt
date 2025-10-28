@@ -1,0 +1,99 @@
+﻿ASA Version 9.6(1)
+!
+hostname ciscoasa
+names
+!
+interface GigabitEthernet1/1
+nameif inside
+security-level 100
+ip address 192.168.1.254 255.255.255.0
+!
+interface GigabitEthernet1/2
+nameif outside
+security-level 0
+no ip address
+shutdown
+!
+interface GigabitEthernet1/3
+no nameif
+no security-level
+no ip address
+shutdown
+!
+interface GigabitEthernet1/4
+no nameif
+no security-level
+no ip address
+shutdown
+!
+interface GigabitEthernet1/5
+no nameif
+no security-level
+no ip address
+shutdown
+!
+interface GigabitEthernet1/6
+no nameif
+no security-level
+no ip address
+shutdown
+!
+interface GigabitEthernet1/7
+no nameif
+no security-level
+ip address 203.0.113.1 255.255.255.252
+!
+interface GigabitEthernet1/8
+no nameif
+no security-level
+no ip address
+shutdown
+!
+interface Management1/1
+management-only
+no nameif
+no security-level
+no ip address
+shutdown
+!
+object network INSIDE_NET
+subnet 192.168.1.0 255.255.255.0
+nat (inside,outside) dynamic interface
+object network PRINTER
+host 192.168.1.100
+!
+route outside 0.0.0.0 0.0.0.0 203.0.113.2 1
+!
+access-list INSIDE_ACCESS extended permit tcp object INSIDE_NET 192.168.1.0 255.255.255.0 eq 515
+access-list INSIDE_ACCESS extended permit tcp object INSIDE_NET 192.168.1.0 255.255.255.0 eq 631
+access-list INSIDE_ACCESS extended permit icmp object INSIDE_NET host 192.168.1.100
+access-list INSIDE_ACCESS extended permit udp any any eq bootps
+access-list INSIDE_ACCESS extended permit udp any any eq bootpc
+access-list INSIDE_OUT extended permit udp any any eq bootps
+access-list INSIDE_OUT extended permit udp any any eq bootpc
+access-list OUTSIDE_IN extended permit udp any any eq bootps
+access-list OUTSIDE_IN extended permit udp any any eq bootpc
+!
+!
+access-group INSIDE_OUT in interface inside
+access-group OUTSIDE_IN in interface outside
+!
+!
+class-map inspection_default
+match default-inspection-traffic
+!
+policy-map type inspect dns preset_dns_map
+parameters
+message-length maximum 512
+policy-map global_policy
+class inspection_default
+inspect dns preset_dns_map
+inspect ftp 
+inspect icmp 
+inspect tftp 
+!
+service-policy global_policy global
+!
+telnet timeout 5
+ssh timeout 5
+

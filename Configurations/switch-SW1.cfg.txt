@@ -1,0 +1,26 @@
+﻿hostname SW1
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+description Link_to_Router
+switchport access vlan 10
+switchport mode access
+!
+interface FastEthernet0/2
+description Link_to_Firewall
+switchport access vlan 20
+switchport mode access
+!
+interface FastEthernet0/3
+description Link_to_Hub
+switchport access vlan 10
+switchport mode access
+!
+
